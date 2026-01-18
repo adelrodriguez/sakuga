@@ -1,14 +1,20 @@
 {
   "extends": "adamantite/typescript",
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "bundler",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "exactOptionalPropertyTypes": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

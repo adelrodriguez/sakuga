@@ -14,6 +14,19 @@ const PIX_FMT_BY_FORMAT: Record<FfmpegFormat, string> = {
   webm: "yuv420p",
 }
 
+const ensureEven = (value: number) => (value % 2 === 0 ? value : value + 1)
+
+export const ensureEvenDimensions = (format: FfmpegFormat, width: number, height: number) => {
+  if (PIX_FMT_BY_FORMAT[format] !== "yuv420p") {
+    return { height, width }
+  }
+
+  return {
+    height: ensureEven(height),
+    width: ensureEven(width),
+  }
+}
+
 const buildArgs = (
   format: FfmpegFormat,
   width: number,
@@ -39,7 +52,9 @@ const buildArgs = (
   outputPath,
 ]
 
-const checkFfmpegCommand = ShellCommand.make("which", FFMPEG_BINARY).pipe(
+const ffmpegCheckCommand = process.platform === "win32" ? "where" : "which"
+
+const checkFfmpegCommand = ShellCommand.make(ffmpegCheckCommand, FFMPEG_BINARY).pipe(
   ShellCommand.stderr("pipe"),
   ShellCommand.stdout("pipe")
 )

@@ -10,7 +10,7 @@ import {
   DEFAULT_WIDTH,
 } from "./constants"
 import { FfmpegRenderFailed, type FfmpegFormat } from "./errors"
-import { ensureFfmpegAvailable, startFfmpegProcess } from "./ffmpeg"
+import { ensureEvenDimensions, ensureFfmpegAvailable, startFfmpegProcess } from "./ffmpeg"
 import { buildFramesStream, computeFrameCounts, renderFrame } from "./render"
 import { layoutScene, measureScene, resolveFrameSize } from "./scene"
 
@@ -27,7 +27,8 @@ const frameToBytes = (context: CanvasContext, width: number, height: number) =>
   Effect.fn("renderVideo.frameToBytes")((frame: RenderFrame) =>
     Effect.sync(() => {
       renderFrame(context, width, height, frame)
-      return (context as SKRSContext2D).canvas.data()
+      const bytes = (context as SKRSContext2D).canvas.data()
+      return Buffer.from(bytes)
     })
   )
 
@@ -55,10 +56,12 @@ export const renderVideo = Effect.fn(function* renderVideo(
   )
 
   const { width, height } = resolveFrameSize(measuredScenes, DEFAULT_WIDTH, DEFAULT_HEIGHT)
-  const canvas = createCanvas(width, height)
+  const { height: evenHeight, width: evenWidth } = ensureEvenDimensions(format, width, height)
+
+  const canvas = createCanvas(evenWidth, evenHeight)
   const context = canvas.getContext("2d")
 
-  const scenes = measuredScenes.map((measured) => layoutScene(measured, width, height))
+  const scenes = measuredScenes.map((measured) => layoutScene(measured, evenWidth, evenHeight))
 
   const frameCounts = computeFrameCounts(transitionDurationMs, fps)
   const frameStream = buildFramesStream(
@@ -66,12 +69,14 @@ export const renderVideo = Effect.fn(function* renderVideo(
     frameCounts.blockFrames,
     frameCounts.transitionFrames
   )
-  const frameBytesStream = frameStream.pipe(Stream.mapEffect(frameToBytes(context, width, height)))
+  const frameBytesStream = frameStream.pipe(
+    Stream.mapEffect(frameToBytes(context, evenWidth, evenHeight))
+  )
 
   return yield* Effect.scoped(
     Effect.gen(function* () {
       const process = yield* Effect.acquireRelease(
-        startFfmpegProcess(format, width, height, fps, outputPath).pipe(
+        startFfmpegProcess(format, evenWidth, evenHeight, fps, outputPath).pipe(
           Effect.mapError(
             (cause) =>
               new FfmpegRenderFailed({
@@ -98,6 +103,14 @@ export const renderVideo = Effect.fn(function* renderVideo(
       )
 
       const exitCode = yield* process.exitCode
+      if (exitCode === null) {
+        return yield* new FfmpegRenderFailed({
+          format,
+          outputPath,
+          stage: "finish",
+        })
+      }
+
       if (Number(exitCode) !== 0) {
         return yield* new FfmpegRenderFailed({
           exitCode: Number(exitCode),

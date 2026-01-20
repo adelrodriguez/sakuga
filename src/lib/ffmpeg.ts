@@ -1,0 +1,70 @@
+import { Command as ShellCommand } from "@effect/platform"
+import { Effect } from "effect"
+import { MissingFfmpeg, type FfmpegFormat } from "./errors"
+
+const FFMPEG_BINARY = "ffmpeg"
+
+const CODEC_BY_FORMAT: Record<FfmpegFormat, string> = {
+  mp4: "libx264",
+  webm: "libvpx-vp9",
+}
+
+const PIX_FMT_BY_FORMAT: Record<FfmpegFormat, string> = {
+  mp4: "yuv420p",
+  webm: "yuv420p",
+}
+
+const buildArgs = (
+  format: FfmpegFormat,
+  width: number,
+  height: number,
+  fps: number,
+  outputPath: string
+) => [
+  "-f",
+  "rawvideo",
+  "-pix_fmt",
+  "rgba",
+  "-s",
+  `${width}x${height}`,
+  "-r",
+  `${fps}`,
+  "-i",
+  "-",
+  "-c:v",
+  CODEC_BY_FORMAT[format],
+  "-pix_fmt",
+  PIX_FMT_BY_FORMAT[format],
+  "-y",
+  outputPath,
+]
+
+const checkFfmpegCommand = ShellCommand.make("which", FFMPEG_BINARY).pipe(
+  ShellCommand.stderr("pipe"),
+  ShellCommand.stdout("pipe")
+)
+
+export const ensureFfmpegAvailable = Effect.fn("ensureFfmpegAvailable")(function* () {
+  const exitCode = yield* checkFfmpegCommand.pipe(
+    ShellCommand.exitCode,
+    Effect.catchAll((cause) => Effect.fail(new MissingFfmpeg({ cause, command: FFMPEG_BINARY })))
+  )
+
+  if (Number(exitCode) !== 0) {
+    return yield* new MissingFfmpeg({ command: FFMPEG_BINARY })
+  }
+})
+
+export const startFfmpegProcess = (
+  format: FfmpegFormat,
+  width: number,
+  height: number,
+  fps: number,
+  outputPath: string
+) =>
+  ShellCommand.make(FFMPEG_BINARY, ...buildArgs(format, width, height, fps, outputPath)).pipe(
+    ShellCommand.stdin("pipe"),
+    ShellCommand.stdout("inherit"),
+    ShellCommand.stderr("inherit"),
+    ShellCommand.start
+  )

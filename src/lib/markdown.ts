@@ -21,7 +21,8 @@ export const parseMarkdownCodeBlocks = Effect.fn(function* parseMarkdownCodeBloc
   markdown: string
 ) {
   const tokens = yield* Effect.try({
-    catch: () => new MissingCodeBlockLanguage({ reason: "Unable to parse markdown." }),
+    catch: () =>
+      new MissingCodeBlockLanguage({ context: "parse", detail: "Unable to parse markdown." }),
     try: () => marked.lexer(markdown),
   })
   const blocks: CodeBlock[] = []
@@ -36,7 +37,8 @@ export const parseMarkdownCodeBlocks = Effect.fn(function* parseMarkdownCodeBloc
 
     if (!language) {
       return yield* new MissingCodeBlockLanguage({
-        reason: "Every fenced code block needs a language (for example: ```ts).",
+        context: "codeBlock",
+        detail: "Every fenced code block needs a language (for example: ```ts).",
       })
     }
 

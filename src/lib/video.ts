@@ -72,30 +72,28 @@ export const renderVideo = Effect.fn(function* renderVideo(
     Effect.gen(function* () {
       const process = yield* Effect.acquireRelease(
         startFfmpegProcess(format, width, height, fps, outputPath).pipe(
-          Effect.catchAll((cause) =>
-            Effect.fail(
+          Effect.mapError(
+            (cause) =>
               new FfmpegRenderFailed({
                 cause,
                 format,
                 outputPath,
                 stage: "init",
               })
-            )
           )
         ),
         (process) => process.kill("SIGTERM").pipe(Effect.orDie)
       )
 
       yield* Stream.run(frameBytesStream, process.stdin).pipe(
-        Effect.catchAll((cause) =>
-          Effect.fail(
+        Effect.mapError(
+          (cause) =>
             new FfmpegRenderFailed({
               cause,
               format,
               outputPath,
               stage: "stream",
             })
-          )
         )
       )
 

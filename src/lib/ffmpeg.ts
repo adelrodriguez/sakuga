@@ -47,7 +47,7 @@ const checkFfmpegCommand = ShellCommand.make("which", FFMPEG_BINARY).pipe(
 export const ensureFfmpegAvailable = Effect.fn("ensureFfmpegAvailable")(function* () {
   const exitCode = yield* checkFfmpegCommand.pipe(
     ShellCommand.exitCode,
-    Effect.catchAll((cause) => Effect.fail(new MissingFfmpeg({ cause, command: FFMPEG_BINARY })))
+    Effect.mapError((cause) => new MissingFfmpeg({ cause, command: FFMPEG_BINARY }))
   )
 
   if (Number(exitCode) !== 0) {

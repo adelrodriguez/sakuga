@@ -116,6 +116,74 @@ export default Command.make("render", {
         yield* Console.log(`Rendering ${blocks.length} code blocks to ${outputPath}...`)
         yield* renderVideo(outputPath, resolvedTheme, blocks, renderConfig, { format })
         yield* Console.log(`Video created at ${outputPath}`)
-      })
+      }).pipe(
+        Effect.catchTags({
+          BadArgument: (error) => Console.error(`Invalid file argument: ${error.message}`),
+          FfmpegRenderFailed: (error) => {
+            const stageMessage = {
+              finish: "finalizing the video file",
+              init: "starting the FFmpeg process",
+              stream: "writing video frames",
+            }[error.stage]
+
+            let message = `FFmpeg failed while ${stageMessage}.\n`
+            message += `  Output: ${error.outputPath}\n`
+            message += `  Format: ${error.format}`
+
+            if (error.exitCode !== undefined) {
+              message += `\n  Exit code: ${error.exitCode}`
+            }
+            if (error.signal) {
+              message += `\n  Signal: ${error.signal}`
+            }
+
+            return Console.error(message)
+          },
+          InvalidTransitionDuration: (error) =>
+            Console.error(
+              `Invalid transition duration: ${error.duration}ms.\n` +
+                `  Minimum allowed: ${error.minimum}ms`
+            ),
+          MissingCodeBlockLanguage: (error) =>
+            Console.error(
+              `Missing language in code block.\n` +
+                `  ${error.detail ?? "Every fenced code block needs a language (e.g., ```typescript)."}\n` +
+                `  See supported languages: https://shiki.style/languages`
+            ),
+          MissingFfmpeg: () =>
+            Console.error(
+              `FFmpeg is not installed or not in PATH.\n` +
+                `  Install FFmpeg to render videos: https://ffmpeg.org/download.html`
+            ),
+          NoCodeBlocksFound: (error) =>
+            Console.error(
+              `No code blocks found${error.path ? ` in ${error.path}` : ""}.\n` +
+                `  Add fenced code blocks with a language to your markdown file.`
+            ),
+          SceneMeasureFailed: (error) => {
+            const details =
+              error.cause instanceof Error ? `\n  Details: ${error.cause.message}` : ""
+            return Console.error(
+              `Failed to process code block.\n  The syntax highlighter could not tokenize the code.${details}`
+            )
+          },
+          SystemError: (error) =>
+            Console.error(
+              `Failed to read input file.\n` +
+                `  Path: ${error.pathOrDescriptor}\n` +
+                `  Reason: ${error.reason}`
+            ),
+          UnknownTheme: (error) =>
+            Console.error(
+              `Unknown theme: "${error.theme}".\n` +
+                `  See available themes: https://shiki.style/themes`
+            ),
+          UnsupportedLanguage: (error) =>
+            Console.error(
+              `Unsupported language: "${error.language}".\n` +
+                `  See supported languages: https://shiki.style/languages`
+            ),
+        })
+      )
   )
 )

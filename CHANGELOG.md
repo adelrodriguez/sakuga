@@ -1,5 +1,13 @@
 # sakuga
 
+## 0.0.4
+
+### Patch Changes
+
+- 79d5960: Fix CLI entry point importing from incorrect file
+
+  Updates bin/sakuga to import from dist/index.js instead of dist/cli.js, ensuring the CLI command works correctly after build.
+
 ## 0.0.3
 
 ### Patch Changes

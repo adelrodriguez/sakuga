@@ -1,7 +1,10 @@
-import { Args, Command } from "@effect/cli"
+import * as Args from "@effect/cli/Args"
+import * as Command from "@effect/cli/Command"
 import * as FileSystem from "@effect/platform/FileSystem"
 import * as Path from "@effect/platform/Path"
-import { Console, Effect, Option } from "effect"
+import * as Console from "effect/Console"
+import * as Effect from "effect/Effect"
+import * as Option from "effect/Option"
 import type { RenderConfig } from "../lib/types"
 import { InvalidTransitionDuration, NoCodeBlocksFound } from "../lib/errors"
 import { parseMarkdownCodeBlocks } from "../lib/markdown"
@@ -23,6 +26,7 @@ import {
   theme,
   transitionDrift,
   transitionDurationMs,
+  verbose,
   width,
 } from "./options"
 
@@ -47,6 +51,7 @@ export default Command.make("render", {
   theme,
   transitionDrift,
   transitionDurationMs,
+  verbose,
   width,
 }).pipe(
   Command.withDescription("Render a video from code blocks in a Markdown file"),
@@ -69,11 +74,13 @@ export default Command.make("render", {
       transitionDurationMs,
       width,
       format,
+      verbose,
     }) =>
       Effect.gen(function* () {
         const fileSystem = yield* FileSystem.FileSystem
         const path = yield* Path.Path
 
+        yield* Console.log(`Reading ${file}...`)
         const markdown = yield* fileSystem.readFileString(file)
         const blocks = yield* parseMarkdownCodeBlocks(markdown)
 
@@ -114,7 +121,7 @@ export default Command.make("render", {
         }
 
         yield* Console.log(`Rendering ${blocks.length} code blocks to ${outputPath}...`)
-        yield* renderVideo(outputPath, resolvedTheme, blocks, renderConfig, { format })
+        yield* renderVideo(outputPath, resolvedTheme, blocks, renderConfig, { format, verbose })
         yield* Console.log(`Video created at ${outputPath}`)
       }).pipe(
         Effect.catchTags({

@@ -1,6 +1,8 @@
-import { Command as ShellCommand } from "@effect/platform"
+import * as ShellCommand from "@effect/platform/Command"
 import * as Path from "@effect/platform/Path"
-import { Chunk, Effect, Stream } from "effect"
+import * as Chunk from "effect/Chunk"
+import * as Effect from "effect/Effect"
+import * as Stream from "effect/Stream"
 import { bundledLanguages, type BundledLanguage } from "shiki"
 import type { CodeBlock } from "./types"
 import {

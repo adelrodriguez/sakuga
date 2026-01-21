@@ -1,4 +1,4 @@
-import { Stream } from "effect"
+import * as Stream from "effect/Stream"
 import type { CanvasContext } from "./context"
 import type { RenderConfig, RenderFrame, Scene } from "./types"
 import { blendColors } from "./color"

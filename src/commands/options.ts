@@ -1,5 +1,5 @@
 import type { BundledTheme } from "shiki"
-import { Options } from "@effect/cli"
+import * as Options from "@effect/cli/Options"
 import * as Schema from "effect/Schema"
 
 const DEFAULT_THEME: BundledTheme = "github-dark"
@@ -106,6 +106,12 @@ export const transitionDurationMs = Options.integer("transition").pipe(
   Options.withAlias("tr"),
   Options.withDefault(DEFAULT_TRANSITION_DURATION_MS),
   Options.withDescription("Transition time between slides in ms")
+)
+
+export const verbose = Options.boolean("verbose", { ifPresent: true }).pipe(
+  Options.withAlias("v"),
+  Options.withDefault(false),
+  Options.withDescription("Show FFmpeg output and detailed logging")
 )
 
 export const width = Options.integer("width").pipe(

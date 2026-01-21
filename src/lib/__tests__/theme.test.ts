@@ -1,5 +1,8 @@
 import { describe, expect, it } from "bun:test"
-import { Cause, Chunk, Effect, Exit } from "effect"
+import * as Cause from "effect/Cause"
+import * as Chunk from "effect/Chunk"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
 import { UnknownTheme } from "../errors"
 import { resolveTheme } from "../theme"
 

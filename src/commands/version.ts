@@ -1,7 +1,8 @@
-import { NodeContext } from "@effect/platform-node"
+import * as NodeContext from "@effect/platform-node/NodeContext"
 import * as FileSystem from "@effect/platform/FileSystem"
 import * as Path from "@effect/platform/Path"
-import { Effect, Schema } from "effect"
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
 
 const PackageJson = Schema.Struct({ version: Schema.String })
 

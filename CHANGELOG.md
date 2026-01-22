@@ -1,5 +1,18 @@
 # sakuga
 
+## 0.1.1
+
+### Patch Changes
+
+- 048bc9b: Hide FFmpeg output by default and add verbose logging.
+
+## 0.1.0
+
+### Minor Changes
+
+- b8406d0: Add git command to render videos from file commit history.
+- 949d105: Document FFmpeg 4.3+ requirement. Switch MP4 to yuv420p pixel format for better compatibility (now requires even dimensions). Adjust encoding defaults: MP4 CRF 12 with high profile, WebM CRF 20. Add faststart flag for improved MP4 streaming.
+
 ## 0.0.4
 
 ### Patch Changes

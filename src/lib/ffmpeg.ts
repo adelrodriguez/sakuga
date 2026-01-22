@@ -1,5 +1,5 @@
-import { Command as ShellCommand } from "@effect/platform"
-import { Effect } from "effect"
+import * as ShellCommand from "@effect/platform/Command"
+import * as Effect from "effect/Effect"
 import { MissingFfmpeg, type FfmpegFormat } from "./errors"
 
 const FFMPEG_BINARY = "ffmpeg"
@@ -98,7 +98,7 @@ export const ensureFfmpegAvailable = Effect.fn("ensureFfmpegAvailable")(function
   }
 })
 
-export function startFfmpegProcess(
+export function startFfmpegCommand(
   format: FfmpegFormat,
   width: number,
   height: number,
@@ -109,10 +109,5 @@ export function startFfmpegProcess(
   return ShellCommand.make(
     FFMPEG_BINARY,
     ...buildArgs(format, width, height, fps, inputPath, outputPath)
-  ).pipe(
-    ShellCommand.stdin("inherit"),
-    ShellCommand.stdout("inherit"),
-    ShellCommand.stderr("inherit"),
-    ShellCommand.start
-  )
+  ).pipe(ShellCommand.stdin("inherit"))
 }

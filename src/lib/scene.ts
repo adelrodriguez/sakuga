@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import * as Effect from "effect/Effect"
 import { codeToTokens, type BundledTheme, type ThemedToken } from "shiki"
 import type { CanvasContext } from "./context"
 import type {

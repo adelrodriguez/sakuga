@@ -1,6 +1,8 @@
-import { Command } from "@effect/cli"
-import { NodeContext, NodeRuntime } from "@effect/platform-node"
-import { Console, Effect } from "effect"
+import * as Command from "@effect/cli/Command"
+import * as NodeContext from "@effect/platform-node/NodeContext"
+import * as NodeRuntime from "@effect/platform-node/NodeRuntime"
+import * as Console from "effect/Console"
+import * as Effect from "effect/Effect"
 import git from "./commands/git"
 import render from "./commands/render"
 import { readVersion } from "./commands/version" with { type: "macro" }

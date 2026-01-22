@@ -1,6 +1,9 @@
-import { Args, Command } from "@effect/cli"
+import * as Args from "@effect/cli/Args"
+import * as Command from "@effect/cli/Command"
 import * as Path from "@effect/platform/Path"
-import { Console, Effect, Option } from "effect"
+import * as Console from "effect/Console"
+import * as Effect from "effect/Effect"
+import * as Option from "effect/Option"
 import type { RenderConfig } from "../lib/types"
 import { InvalidTransitionDuration, NoCodeBlocksFound } from "../lib/errors"
 import { loadGitHistoryBlocks } from "../lib/git"
@@ -25,6 +28,7 @@ import {
   theme,
   transitionDrift,
   transitionDurationMs,
+  verbose,
   width,
 } from "./options"
 
@@ -52,6 +56,7 @@ const gitOptions = {
   theme,
   transitionDrift,
   transitionDurationMs,
+  verbose,
   width,
 }
 
@@ -78,6 +83,7 @@ export default Command.make("git", gitOptions).pipe(
       theme,
       transitionDrift,
       transitionDurationMs,
+      verbose,
       width,
     }) =>
       Effect.gen(function* () {
@@ -93,6 +99,7 @@ export default Command.make("git", gitOptions).pipe(
         const resolvedTheme = yield* resolveTheme(theme)
         const cwd = process.cwd()
 
+        yield* Console.log(`Loading ${commits} commits from ${file}...`)
         const blocks = yield* loadGitHistoryBlocks(
           cwd,
           file,
@@ -131,7 +138,7 @@ export default Command.make("git", gitOptions).pipe(
 
         yield* Console.log(`Rendering ${blocks.length} commits to ${outputPath}...`)
 
-        yield* renderVideo(outputPath, resolvedTheme, blocks, renderConfig, { format })
+        yield* renderVideo(outputPath, resolvedTheme, blocks, renderConfig, { format, verbose })
 
         yield* Console.log(`Video created at ${outputPath}`)
       }).pipe(

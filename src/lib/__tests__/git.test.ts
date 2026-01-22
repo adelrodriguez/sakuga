@@ -1,6 +1,9 @@
 import { describe, expect, it } from "bun:test"
-import { NodePath } from "@effect/platform-node"
-import { Cause, Chunk, Effect, Exit } from "effect"
+import * as NodePath from "@effect/platform-node/NodePath"
+import * as Cause from "effect/Cause"
+import * as Chunk from "effect/Chunk"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
 import { UnsupportedFileExtension, UnsupportedLanguage } from "../errors"
 import { resolveLanguage } from "../git"
 

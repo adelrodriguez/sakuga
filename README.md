@@ -51,6 +51,7 @@ Note: With `@effect/cli@0.73.0`, options must appear before positional args.
 
 - `--format`, `-f`: Output container (`mp4` or `webm`, default: `mp4`).
 - `--output`, `-o`: Output path (defaults to the input name + format extension).
+- `--verbose`, `-v`: Show FFmpeg output and detailed logging.
 - `--commits`, `-c`: Number of commits to render for `sakuga git` (default: `10`).
 - `--reverse`: Render newest to oldest for `sakuga git`.
 - `--language`, `-l`: Override the syntax highlighting language for `sakuga git`.

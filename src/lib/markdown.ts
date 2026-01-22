@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import * as Effect from "effect/Effect"
 import { marked } from "marked"
 import { bundledLanguages, type BundledLanguage } from "shiki"
 import type { CodeBlock } from "./types"

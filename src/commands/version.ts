@@ -1,10 +1,11 @@
-import * as NodeContext from "@effect/platform-node/NodeContext"
-import * as FileSystem from "@effect/platform/FileSystem"
-import * as Path from "@effect/platform/Path"
+import * as NodeServices from "@effect/platform-node/NodeServices"
 import * as Effect from "effect/Effect"
+import * as FileSystem from "effect/FileSystem"
+import * as Path from "effect/Path"
 import * as Schema from "effect/Schema"
 
 const PackageJson = Schema.Struct({ version: Schema.String })
+const PackageJsonFromFile = Schema.fromJsonString(PackageJson)
 
 export const readVersion = () =>
   Effect.runPromise(
@@ -14,15 +15,8 @@ export const readVersion = () =>
       const contents = yield* fs.readFileString(
         path.join(import.meta.dirname, "../..", "package.json")
       )
-      const parsed = yield* Schema.decodeUnknown(Schema.parseJson(PackageJson))(contents)
+      const parsed = yield* Schema.decodeUnknownEffect(PackageJsonFromFile)(contents)
 
       return parsed.version
-    }).pipe(
-      Effect.provide(NodeContext.layer),
-      Effect.catchTags({
-        BadArgument: () => Effect.die("Failed to read version from package.json"),
-        ParseError: () => Effect.die("Unable to parse version from package.json"),
-        SystemError: () => Effect.die("System error reading package.json"),
-      })
-    )
+    }).pipe(Effect.provide(NodeServices.layer), Effect.orDie)
   )

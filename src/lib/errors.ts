@@ -1,9 +1,25 @@
+import type * as ChildProcessSpawner from "effect/unstable/process/ChildProcessSpawner"
 import * as Data from "effect/Data"
 
 export type FfmpegFormat = "mp4" | "webm"
 
+/** Best-effort `.message` from an unknown value (no `instanceof`). */
+export function messageFromUnknown(cause: unknown): string | undefined {
+  if (cause === null || cause === undefined) {
+    return undefined
+  }
+  if (typeof cause === "object" && "message" in cause) {
+    const m = (cause as { message: unknown }).message
+    if (typeof m === "string" && m.length > 0) {
+      return m
+    }
+  }
+  return undefined
+}
+
 export class SceneMeasureFailed extends Data.TaggedError("SceneMeasureFailed")<{
   cause: unknown
+  readonly detail?: string | undefined
 }> {}
 
 export class UnknownTheme extends Data.TaggedError("UnknownTheme")<{ theme: string }> {}
@@ -52,6 +68,6 @@ export class FfmpegRenderFailed extends Data.TaggedError("FfmpegRenderFailed")<{
   outputPath: string
   stage: "init" | "stream" | "finish"
   cause?: unknown
-  exitCode?: number
+  exitCode?: ChildProcessSpawner.ExitCode
   signal?: string
 }> {}

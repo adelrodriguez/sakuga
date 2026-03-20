@@ -1,8 +1,7 @@
-import * as ShellCommand from "@effect/platform/Command"
-import * as Path from "@effect/platform/Path"
-import * as Chunk from "effect/Chunk"
 import * as Effect from "effect/Effect"
+import * as Path from "effect/Path"
 import * as Stream from "effect/Stream"
+import * as ChildProcess from "effect/unstable/process/ChildProcess"
 import { bundledLanguages, type BundledLanguage } from "shiki"
 import type { CodeBlock } from "./types"
 import {
@@ -30,27 +29,24 @@ function resolveLanguageOverride(override: string | undefined) {
   return normalized
 }
 
-function decodeChunks(chunks: Chunk.Chunk<Uint8Array>) {
-  return Buffer.concat(Chunk.toArray(chunks).map((chunk) => Buffer.from(chunk))).toString("utf8")
+function decodeChunks(chunks: readonly Uint8Array[]) {
+  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).toString("utf8")
 }
 
 const runGitString = Effect.fn(function* runGitString(cwd: string, args: string[]) {
   return yield* Effect.scoped(
     Effect.gen(function* () {
-      const command = ShellCommand.make(GIT_BINARY, ...args).pipe(
-        ShellCommand.workingDirectory(cwd),
-        ShellCommand.stdout("pipe"),
-        ShellCommand.stderr("pipe")
-      )
-
-      const process = yield* ShellCommand.start(command).pipe(
-        Effect.mapError((cause) => new GitCommandFailed({ args, cause }))
-      )
+      const handle = yield* ChildProcess.make(GIT_BINARY, args, {
+        cwd,
+        stderr: "pipe",
+        stdin: "ignore",
+        stdout: "pipe",
+      })
 
       const [stdoutChunks, stderrChunks, exitCode] = yield* Effect.all([
-        Stream.runCollect(process.stdout),
-        Stream.runCollect(process.stderr),
-        process.exitCode,
+        Stream.runCollect(handle.stdout),
+        Stream.runCollect(handle.stderr),
+        handle.exitCode,
       ]).pipe(Effect.mapError((cause) => new GitCommandFailed({ args, cause })))
 
       const stdout = decodeChunks(stdoutChunks)
@@ -98,7 +94,7 @@ export const resolveLanguage = Effect.fn(function* resolveLanguage(
 
 export const resolveGitRepoRoot = Effect.fn(function* resolveGitRepoRoot(cwd: string) {
   const output = yield* runGitString(cwd, ["rev-parse", "--show-toplevel"]).pipe(
-    Effect.catchTag("GitCommandFailed", () => new GitRepositoryNotFound({ path: cwd }))
+    Effect.catchTag("GitCommandFailed", () => Effect.fail(new GitRepositoryNotFound({ path: cwd })))
   )
 
   const repoRoot = output.trim()

@@ -15,7 +15,7 @@ import {
   FONT_STYLE_NONE,
   FONT_STYLE_UNDERLINE,
 } from "./constants"
-import { SceneMeasureFailed } from "./errors"
+import { messageFromUnknown, SceneMeasureFailed } from "./errors"
 import { buildFont, drawUnderline } from "./text"
 import { categorizeToken } from "./token"
 
@@ -77,7 +77,7 @@ export const measureScene = Effect.fn(function* measureScene(
   theme: BundledTheme
 ) {
   return yield* Effect.tryPromise({
-    catch: (cause: unknown) => new SceneMeasureFailed({ cause }),
+    catch: (cause: unknown) => new SceneMeasureFailed({ cause, detail: messageFromUnknown(cause) }),
     try: async () => {
       const tokenResult = await codeToTokens(codeBlock.code, {
         includeExplanation: "scopeName",

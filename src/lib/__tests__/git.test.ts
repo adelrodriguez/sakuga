@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import * as NodePath from "@effect/platform-node/NodePath"
 import * as Cause from "effect/Cause"
-import * as Chunk from "effect/Chunk"
 import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
 import { UnsupportedFileExtension, UnsupportedLanguage } from "../errors"
@@ -23,8 +22,8 @@ describe("resolveLanguage", () => {
     const exit = resolveLanguageExit("LICENSE")
     expect(exit._tag).toBe("Failure")
     if (Exit.isFailure(exit)) {
-      const errors = Chunk.toArray(Cause.failures(exit.cause))
-      expect(errors[0]).toBeInstanceOf(UnsupportedFileExtension)
+      const fail = exit.cause.reasons.find(Cause.isFailReason)
+      expect(fail?.error).toBeInstanceOf(UnsupportedFileExtension)
     }
   })
 
@@ -37,8 +36,8 @@ describe("resolveLanguage", () => {
     const exit = resolveLanguageExit("src/index.ts", "nope")
     expect(exit._tag).toBe("Failure")
     if (Exit.isFailure(exit)) {
-      const errors = Chunk.toArray(Cause.failures(exit.cause))
-      expect(errors[0]).toBeInstanceOf(UnsupportedLanguage)
+      const fail = exit.cause.reasons.find(Cause.isFailReason)
+      expect(fail?.error).toBeInstanceOf(UnsupportedLanguage)
     }
   })
 })

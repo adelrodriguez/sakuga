@@ -1,5 +1,6 @@
-import * as ShellCommand from "@effect/platform/Command"
 import * as Effect from "effect/Effect"
+import * as ChildProcess from "effect/unstable/process/ChildProcess"
+import * as ChildProcessSpawner from "effect/unstable/process/ChildProcessSpawner"
 import { MissingFfmpeg, type FfmpegFormat } from "./errors"
 
 const FFMPEG_BINARY = "ffmpeg"
@@ -86,28 +87,38 @@ function buildArgs(
 const ffmpegCheckCommand = process.platform === "win32" ? "where" : "which"
 
 export const ensureFfmpegAvailable = Effect.fn("ensureFfmpegAvailable")(function* () {
-  const exitCode = yield* ShellCommand.make(ffmpegCheckCommand, FFMPEG_BINARY).pipe(
-    ShellCommand.stderr("pipe"),
-    ShellCommand.stdout("pipe"),
-    ShellCommand.exitCode,
-    Effect.mapError((cause) => new MissingFfmpeg({ cause, command: FFMPEG_BINARY }))
-  )
+  const exitCode = yield* Effect.scoped(
+    Effect.gen(function* () {
+      const handle = yield* ChildProcess.make(ffmpegCheckCommand, [FFMPEG_BINARY], {
+        stderr: "ignore",
+        stdin: "ignore",
+        stdout: "ignore",
+      })
+      return yield* handle.exitCode
+    })
+  ).pipe(Effect.mapError((cause) => new MissingFfmpeg({ cause, command: FFMPEG_BINARY })))
 
-  if (Number(exitCode) !== 0) {
+  if (exitCode !== ChildProcessSpawner.ExitCode(0)) {
     return yield* new MissingFfmpeg({ command: FFMPEG_BINARY })
   }
 })
 
-export function startFfmpegCommand(
+export function makeFfmpegCommand(
   format: FfmpegFormat,
   width: number,
   height: number,
   fps: number,
   inputPath: string,
-  outputPath: string
+  outputPath: string,
+  verbose: boolean
 ) {
-  return ShellCommand.make(
+  return ChildProcess.make(
     FFMPEG_BINARY,
-    ...buildArgs(format, width, height, fps, inputPath, outputPath)
-  ).pipe(ShellCommand.stdin("inherit"))
+    buildArgs(format, width, height, fps, inputPath, outputPath),
+    {
+      stderr: verbose ? "inherit" : "pipe",
+      stdin: "inherit",
+      stdout: verbose ? "inherit" : "pipe",
+    }
+  )
 }

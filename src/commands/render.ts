@@ -1,10 +1,10 @@
-import * as Args from "@effect/cli/Args"
-import * as Command from "@effect/cli/Command"
-import * as FileSystem from "@effect/platform/FileSystem"
-import * as Path from "@effect/platform/Path"
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
+import * as FileSystem from "effect/FileSystem"
 import * as Option from "effect/Option"
+import * as Path from "effect/Path"
+import * as Argument from "effect/unstable/cli/Argument"
+import * as Command from "effect/unstable/cli/Command"
 import type { RenderConfig } from "../lib/types"
 import { InvalidTransitionDuration, NoCodeBlocksFound } from "../lib/errors"
 import { parseMarkdownCodeBlocks } from "../lib/markdown"
@@ -30,8 +30,8 @@ import {
   width,
 } from "./options"
 
-const file = Args.file({ exists: "yes", name: "input" }).pipe(
-  Args.withDescription("Markdown file to render")
+const file = Argument.file("input", { mustExist: true }).pipe(
+  Argument.withDescription("Markdown file to render")
 )
 
 export default Command.make("render", {
@@ -124,8 +124,17 @@ export default Command.make("render", {
         yield* renderVideo(outputPath, resolvedTheme, blocks, renderConfig, { format, verbose })
         yield* Console.log(`Video created at ${outputPath}`)
       }).pipe(
+        Effect.catchTag("PlatformError", (error) => {
+          const { reason } = error
+          return reason._tag === "BadArgument"
+            ? Console.error(`Failed to read input file.\n  ${error.message}`)
+            : Console.error(
+                `Failed to read input file.\n` +
+                  `  Path: ${reason.pathOrDescriptor}\n` +
+                  `  Reason: ${reason._tag}`
+              )
+        }),
         Effect.catchTags({
-          BadArgument: (error) => Console.error(`Invalid file argument: ${error.message}`),
           FfmpegRenderFailed: (error) => {
             const stageMessage = {
               finish: "finalizing the video file",
@@ -168,18 +177,11 @@ export default Command.make("render", {
                 `  Add fenced code blocks with a language to your markdown file.`
             ),
           SceneMeasureFailed: (error) => {
-            const details =
-              error.cause instanceof Error ? `\n  Details: ${error.cause.message}` : ""
+            const details = error.detail ? `\n  Details: ${error.detail}` : ""
             return Console.error(
               `Failed to process code block.\n  The syntax highlighter could not tokenize the code.${details}`
             )
           },
-          SystemError: (error) =>
-            Console.error(
-              `Failed to read input file.\n` +
-                `  Path: ${error.pathOrDescriptor}\n` +
-                `  Reason: ${error.reason}`
-            ),
           UnknownTheme: (error) =>
             Console.error(
               `Unknown theme: "${error.theme}".\n` +

@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test"
 import * as Cause from "effect/Cause"
-import * as Chunk from "effect/Chunk"
 import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
 import { MissingCodeBlockLanguage, UnsupportedLanguage } from "../errors"
@@ -43,8 +42,8 @@ describe("parseMarkdownCodeBlocks", () => {
 
     expect(exit._tag).toBe("Failure")
     if (Exit.isFailure(exit)) {
-      const errors = Chunk.toArray(Cause.failures(exit.cause))
-      expect(errors[0]).toBeInstanceOf(MissingCodeBlockLanguage)
+      const fail = exit.cause.reasons.find(Cause.isFailReason)
+      expect(fail?.error).toBeInstanceOf(MissingCodeBlockLanguage)
     }
   })
 
@@ -55,8 +54,8 @@ describe("parseMarkdownCodeBlocks", () => {
 
     expect(exit._tag).toBe("Failure")
     if (Exit.isFailure(exit)) {
-      const errors = Chunk.toArray(Cause.failures(exit.cause))
-      expect(errors[0]).toBeInstanceOf(UnsupportedLanguage)
+      const fail = exit.cause.reasons.find(Cause.isFailReason)
+      expect(fail?.error).toBeInstanceOf(UnsupportedLanguage)
     }
   })
 })

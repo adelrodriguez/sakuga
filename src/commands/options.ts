@@ -1,6 +1,6 @@
 import type { BundledTheme } from "shiki"
-import * as Options from "@effect/cli/Options"
 import * as Schema from "effect/Schema"
+import * as Flag from "effect/unstable/cli/Flag"
 
 const DEFAULT_THEME: BundledTheme = "github-dark"
 const DEFAULT_WIDTH = 0
@@ -18,124 +18,124 @@ const DEFAULT_LINE_HEIGHT = 34
 const DEFAULT_PADDING = 64
 const TAB_REPLACEMENT = "  "
 
-export const background = Options.text("background").pipe(
-  Options.withAlias("bg"),
-  Options.withDefault(DEFAULT_BACKGROUND),
-  Options.withDescription("Background color behind the code")
+export const background = Flag.string("background").pipe(
+  Flag.withAlias("bg"),
+  Flag.withDefault(DEFAULT_BACKGROUND),
+  Flag.withDescription("Background color behind the code")
 )
 
-export const blockDuration = Options.float("block-duration").pipe(
-  Options.withAlias("bd"),
-  Options.withDefault(DEFAULT_BLOCK_DURATION),
-  Options.withDescription("Seconds each code block stays on screen")
+export const blockDuration = Flag.float("block-duration").pipe(
+  Flag.withAlias("bd"),
+  Flag.withDefault(DEFAULT_BLOCK_DURATION),
+  Flag.withDescription("Seconds each code block stays on screen")
 )
 
-export const fontFamily = Options.text("font-family").pipe(
-  Options.withAlias("ff"),
-  Options.withDefault(DEFAULT_FONT_FAMILY),
-  Options.withDescription("Font family for the text")
+export const fontFamily = Flag.string("font-family").pipe(
+  Flag.withAlias("ff"),
+  Flag.withDefault(DEFAULT_FONT_FAMILY),
+  Flag.withDescription("Font family for the text")
 )
 
-export const fontSize = Options.integer("font-size").pipe(
-  Options.withAlias("fs"),
-  Options.withDefault(DEFAULT_FONT_SIZE),
-  Options.withDescription("Font size in pixels")
+export const fontSize = Flag.integer("font-size").pipe(
+  Flag.withAlias("fs"),
+  Flag.withDefault(DEFAULT_FONT_SIZE),
+  Flag.withDescription("Font size in pixels")
 )
 
-export const foreground = Options.text("foreground").pipe(
-  Options.withAlias("fg"),
-  Options.withDefault(DEFAULT_FOREGROUND),
-  Options.withDescription("Default text color")
+export const foreground = Flag.string("foreground").pipe(
+  Flag.withAlias("fg"),
+  Flag.withDefault(DEFAULT_FOREGROUND),
+  Flag.withDescription("Default text color")
 )
 
-export const format = Options.choice("format", ["mp4", "webm"] as const).pipe(
-  Options.withAlias("f"),
-  Options.withDefault("mp4"),
-  Options.withDescription("Output container format.")
+export const format = Flag.choice("format", ["mp4", "webm"] as const).pipe(
+  Flag.withAlias("f"),
+  Flag.withDefault("mp4"),
+  Flag.withDescription("Output container format.")
 )
 
-export const fps = Options.integer("fps").pipe(
-  Options.withAlias("r"),
-  Options.withDefault(DEFAULT_FPS),
-  Options.withDescription("Frames per second for the video")
+export const fps = Flag.integer("fps").pipe(
+  Flag.withAlias("r"),
+  Flag.withDefault(DEFAULT_FPS),
+  Flag.withDescription("Frames per second for the video")
 )
 
-export const height = Options.integer("height").pipe(
-  Options.withAlias("h"),
-  Options.withDefault(DEFAULT_HEIGHT),
-  Options.withDescription("Minimum output height in pixels (0 = auto)")
+export const height = Flag.integer("height").pipe(
+  Flag.withAlias("h"),
+  Flag.withDefault(DEFAULT_HEIGHT),
+  Flag.withDescription("Minimum output height in pixels (0 = auto)")
 )
 
-export const lineHeight = Options.integer("line-height").pipe(
-  Options.withAlias("lh"),
-  Options.withDefault(DEFAULT_LINE_HEIGHT),
-  Options.withDescription("Line height in pixels")
+export const lineHeight = Flag.integer("line-height").pipe(
+  Flag.withAlias("lh"),
+  Flag.withDefault(DEFAULT_LINE_HEIGHT),
+  Flag.withDescription("Line height in pixels")
 )
 
-export const output = Options.file("output").pipe(
-  Options.withAlias("o"),
-  Options.withDescription("Destination video path"),
-  Options.optional
+export const output = Flag.file("output").pipe(
+  Flag.withAlias("o"),
+  Flag.withDescription("Destination video path"),
+  Flag.optional
 )
 
-export const padding = Options.integer("padding").pipe(
-  Options.withAlias("p"),
-  Options.withDefault(DEFAULT_PADDING),
-  Options.withDescription("Padding around the code block in pixels")
+export const padding = Flag.integer("padding").pipe(
+  Flag.withAlias("p"),
+  Flag.withDefault(DEFAULT_PADDING),
+  Flag.withDescription("Padding around the code block in pixels")
 )
 
-export const tabReplacement = Options.text("tab-replacement").pipe(
-  Options.withAlias("tb"),
-  Options.withDefault(TAB_REPLACEMENT),
-  Options.withDescription("Text used instead of tabs")
+export const tabReplacement = Flag.string("tab-replacement").pipe(
+  Flag.withAlias("tb"),
+  Flag.withDefault(TAB_REPLACEMENT),
+  Flag.withDescription("Text used instead of tabs")
 )
 
-export const theme = Options.text("theme").pipe(
-  Options.withAlias("t"),
-  Options.withDefault(DEFAULT_THEME),
-  Options.withDescription("Shiki theme for syntax highlighting")
+export const theme = Flag.string("theme").pipe(
+  Flag.withAlias("t"),
+  Flag.withDefault(DEFAULT_THEME),
+  Flag.withDescription("Shiki theme for syntax highlighting")
 )
 
-export const transitionDrift = Options.float("transition-drift").pipe(
-  Options.withAlias("td"),
-  Options.withDefault(DEFAULT_TRANSITION_DRIFT),
-  Options.withDescription("Pixel drift during transitions")
+export const transitionDrift = Flag.float("transition-drift").pipe(
+  Flag.withAlias("td"),
+  Flag.withDefault(DEFAULT_TRANSITION_DRIFT),
+  Flag.withDescription("Pixel drift during transitions")
 )
 
-export const transitionDurationMs = Options.integer("transition").pipe(
-  Options.withAlias("tr"),
-  Options.withDefault(DEFAULT_TRANSITION_DURATION_MS),
-  Options.withDescription("Transition time between slides in ms")
+export const transitionDurationMs = Flag.integer("transition").pipe(
+  Flag.withAlias("tr"),
+  Flag.withDefault(DEFAULT_TRANSITION_DURATION_MS),
+  Flag.withDescription("Transition time between slides in ms")
 )
 
-export const verbose = Options.boolean("verbose", { ifPresent: true }).pipe(
-  Options.withAlias("v"),
-  Options.withDefault(false),
-  Options.withDescription("Show FFmpeg output and detailed logging")
+export const verbose = Flag.boolean("verbose").pipe(
+  Flag.withAlias("v"),
+  Flag.withDefault(false),
+  Flag.withDescription("Show FFmpeg output and detailed logging")
 )
 
-export const width = Options.integer("width").pipe(
-  Options.withAlias("w"),
-  Options.withDefault(DEFAULT_WIDTH),
-  Options.withDescription("Minimum output width in pixels (0 = auto)")
+export const width = Flag.integer("width").pipe(
+  Flag.withAlias("w"),
+  Flag.withDefault(DEFAULT_WIDTH),
+  Flag.withDescription("Minimum output width in pixels (0 = auto)")
 )
 
 // Git-specific options
 
-export const commits = Options.integer("commits").pipe(
-  Options.withAlias("c"),
-  Options.withDefault(10),
-  Options.withSchema(Schema.Number.pipe(Schema.greaterThanOrEqualTo(1))),
-  Options.withDescription("Number of commits to render")
+export const commits = Flag.integer("commits").pipe(
+  Flag.withAlias("c"),
+  Flag.withDefault(10),
+  Flag.withSchema(Schema.Number.pipe(Schema.check(Schema.isGreaterThanOrEqualTo(1)))),
+  Flag.withDescription("Number of commits to render")
 )
 
-export const language = Options.text("language").pipe(
-  Options.withAlias("l"),
-  Options.optional,
-  Options.withDescription("Override the language used for syntax highlighting")
+export const language = Flag.string("language").pipe(
+  Flag.withAlias("l"),
+  Flag.optional,
+  Flag.withDescription("Override the language used for syntax highlighting")
 )
 
-export const reverse = Options.boolean("reverse", { ifPresent: true }).pipe(
-  Options.withDescription("Render from newest to oldest commit"),
-  Options.withDefault(false)
+export const reverse = Flag.boolean("reverse").pipe(
+  Flag.withDescription("Render from newest to oldest commit"),
+  Flag.withDefault(false)
 )

@@ -1,9 +1,9 @@
-import * as Args from "@effect/cli/Args"
-import * as Command from "@effect/cli/Command"
-import * as Path from "@effect/platform/Path"
 import * as Console from "effect/Console"
 import * as Effect from "effect/Effect"
 import * as Option from "effect/Option"
+import * as Path from "effect/Path"
+import * as Argument from "effect/unstable/cli/Argument"
+import * as Command from "effect/unstable/cli/Command"
 import type { RenderConfig } from "../lib/types"
 import { InvalidTransitionDuration, NoCodeBlocksFound } from "../lib/errors"
 import { loadGitHistoryBlocks } from "../lib/git"
@@ -32,8 +32,8 @@ import {
   width,
 } from "./options"
 
-const file = Args.file({ exists: "yes", name: "input" }).pipe(
-  Args.withDescription("File to render git history from")
+const file = Argument.file("input", { mustExist: true }).pipe(
+  Argument.withDescription("File to render git history from")
 )
 
 const gitOptions = {
@@ -196,8 +196,7 @@ export default Command.make("git", gitOptions).pipe(
                 `  The file must have at least one commit in git history.`
             ),
           SceneMeasureFailed: (error) => {
-            const details =
-              error.cause instanceof Error ? `\n  Details: ${error.cause.message}` : ""
+            const details = error.detail ? `\n  Details: ${error.detail}` : ""
             return Console.error(
               `Failed to process code block.\n  The syntax highlighter could not tokenize the code.${details}`
             )

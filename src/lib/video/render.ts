@@ -3,6 +3,7 @@ import type { BundledTheme } from "shiki"
 import * as Effect from "effect/Effect"
 import * as FileSystem from "effect/FileSystem"
 import * as Stream from "effect/Stream"
+import type { Frame } from "#lib/scene/model.ts"
 import type { CodeBlock, RenderConfig, VideoFormat } from "#lib/shared/model.ts"
 import { makeCanvas } from "#lib/scene/canvas.ts"
 import { drawFrame } from "#lib/scene/draw.ts"
@@ -19,6 +20,17 @@ export interface RenderVideoOptions {
   readonly outputPath: string
   readonly theme: BundledTheme
   readonly verbose: boolean
+}
+
+/**
+ * Turns frames into raw pixels one at a time. Pixel buffers are large, so only one exists before
+ * the sink writes it, however long a scene holds. `Stream.map` would convert a whole chunk first.
+ */
+export function rasterizeFrames<E, R>(
+  frames: Stream.Stream<Frame, E, R>,
+  rasterize: (frame: Frame) => Uint8Array
+) {
+  return frames.pipe(Stream.mapEffect((frame) => Effect.sync(() => rasterize(frame))))
 }
 
 /**
@@ -46,12 +58,10 @@ export const renderVideo = Effect.fn("Video.render")(function* (options: RenderV
 
   const canvas = makeCanvas(width, height)
   const scenes = measuredScenes.map((measured) => layoutScene(config, measured, width, height))
-  const frameBytes = buildFrames(config, scenes).pipe(
-    Stream.map((frame) => {
-      drawFrame(config, canvas.context, width, height, frame)
-      return canvas.snapshot()
-    })
-  )
+  const frameBytes = rasterizeFrames(buildFrames(config, scenes), (frame) => {
+    drawFrame(config, canvas.context, width, height, frame)
+    return canvas.snapshot()
+  })
 
   yield* Effect.scoped(
     Effect.gen(function* () {

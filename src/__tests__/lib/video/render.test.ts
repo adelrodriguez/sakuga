@@ -6,11 +6,13 @@ import * as Layer from "effect/Layer"
 import * as Logger from "effect/Logger"
 import * as Option from "effect/Option"
 import * as Ref from "effect/Ref"
+import * as Stream from "effect/Stream"
 import type { EncodeOptions } from "#lib/video/ffmpeg.ts"
 import { renderConfig } from "#__tests__/fixtures.ts"
+import { buildFrames } from "#lib/scene/frames.ts"
 import { MissingFfmpeg } from "#lib/shared/errors.ts"
 import { Ffmpeg } from "#lib/video/ffmpeg.ts"
-import { renderVideo } from "#lib/video/render.ts"
+import { rasterizeFrames, renderVideo } from "#lib/video/render.ts"
 
 const silent = Logger.layer([])
 
@@ -72,5 +74,31 @@ describe("renderVideo", () => {
     )
 
     expect(error).toBeInstanceOf(MissingFfmpeg)
+  })
+
+  it("rasterizes one frame at a time, so the sink writes before a scene finishes", async () => {
+    const scenes = [
+      { background: "#000000", tokens: [] },
+      { background: "#ffffff", tokens: [] },
+    ]
+    let rasterized = 0
+    let rasterizedAtFirstWrite = 0
+
+    await Effect.runPromise(
+      rasterizeFrames(buildFrames(renderConfig, scenes), () => {
+        rasterized += 1
+        return new Uint8Array(1)
+      }).pipe(
+        Stream.runForEach(() =>
+          Effect.sync(() => {
+            rasterizedAtFirstWrite ||= rasterized
+          })
+        )
+      )
+    )
+
+    // The default config holds each scene for 120 frames.
+    expect(rasterizedAtFirstWrite).toBe(1)
+    expect(rasterized).toBe(120 * 2 + 48)
   })
 })

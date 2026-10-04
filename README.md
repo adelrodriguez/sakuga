@@ -10,7 +10,7 @@
 
 ## Requirements
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Node.js](https://nodejs.org/) (v20 or higher)
 - [ffmpeg](https://ffmpeg.org/) (v4.3+ in your PATH)
 
 ## How To Use
@@ -46,8 +46,6 @@ bunx sakuga git --reverse README.md
 ```
 
 ### Options
-
-Note: With `@effect/cli@0.73.0`, options must appear before positional args.
 
 - `--format`, `-f`: Output container (`mp4` or `webm`, default: `mp4`).
 - `--output`, `-o`: Output path (defaults to the input name + format extension).

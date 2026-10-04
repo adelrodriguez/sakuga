@@ -1,21 +1,22 @@
 {
   "extends": "adamantite/typescript",
   "compilerOptions": {
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "Preserve",
-    "moduleDetection": "force",
-    "jsx": "react-jsx",
-    "allowJs": true,
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "exactOptionalPropertyTypes": true,
+    "types": ["bun"],
     "plugins": [
       {
-        "name": "@effect/language-service"
+        "name": "@effect/language-service",
+        "diagnostics": false,
+        "allowedUnstableApis": ["effect/cli", "effect/process"]
       }
     ]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts", "*.config.ts"],
+  "exclude": ["node_modules", "dist", ".packref"]
 }

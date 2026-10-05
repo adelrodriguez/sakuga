@@ -1,5 +1,11 @@
 # sakuga
 
+## 0.2.0
+
+### Minor Changes
+
+- 9437938: Upgrade to Effect 4.0.0 and reorganize the CLI into `lib`, `terminal`, and `commands` layers. Failed renders now exit with code 1, `--fps` must be at least 1, and `sakuga git` finds the repository from the file's own directory.
+
 ## 0.1.0
 
 ### Minor Changes
@@ -24,6 +30,7 @@
 ### Patch Changes
 
 - 4ebbd91: Improve error handling with informative, well-formatted error messages.
+
   - Add comprehensive error handlers for all render command errors (file system, markdown parsing, theme, FFmpeg, validation)
   - Include documentation links to Shiki languages/themes and FFmpeg installation
   - Add CLI validation error handlers for unclustered flags and multiple values
@@ -40,6 +47,7 @@
 ### Patch Changes
 
 - 7ed7730: Improve template initialization and documentation structure
+
   - Restructure CLAUDE.md with clear sections for Agents and Bun usage instructions
   - Enhance template script to remove CHANGELOG.md along with docs directory during initialization
   - Improve user feedback messages during template cleanup process

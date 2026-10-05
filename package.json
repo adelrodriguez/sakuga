@@ -32,13 +32,13 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
   "scripts": {
     "analyze": "adamantite analyze",
     "build": "bunup",
+    "build:verify": "bun run build && bun scripts/verify-build.ts",
     "bump:deps": "bun update --interactive",
     "check": "adamantite check",
     "dev": "bunup --watch",

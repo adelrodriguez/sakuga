@@ -1,0 +1,45 @@
+name: build
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_run:
+    workflows: ["test"]
+    branches: [main]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event_name == 'pull_request' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # The packed CLI is checked on the oldest Node.js that `engines.node` allows.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build and verify package
+        run: bun run build:verify

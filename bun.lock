@@ -15,7 +15,7 @@
         "@changesets/cli": "2.29.8",
         "@effect/language-service": "^0.87.3",
         "@effect/tsgo": "0.48.0",
-        "@types/bun": "1.3.5",
+        "@types/bun": "1.4.4",
         "adamantite": "^0.43.0",
         "bunup": "0.16.17",
         "knip": "6.39.0",
@@ -402,7 +402,7 @@
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.4", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A=="],
 
-    "@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
+    "@types/bun": ["@types/bun@1.4.4", "", { "dependencies": { "bun-types": "1.4.4" } }, "sha512-9wkRDXUXK124pEnAutE6n/l18j+i9GC5IAHK8TmX/2nlySETmky0OU6yL5U8pW1AoKh++AN9auDCr647BfurjQ=="],
 
     "@types/hast": ["@types/hast@3.0.4", "", { "dependencies": { "@types/unist": "*" } }, "sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ=="],
 
@@ -470,7 +470,7 @@
 
     "braces": ["braces@3.0.3", "", { "dependencies": { "fill-range": "^7.1.1" } }, "sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA=="],
 
-    "bun-types": ["bun-types@1.3.5", "", { "dependencies": { "@types/node": "*" } }, "sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw=="],
+    "bun-types": ["bun-types@1.4.4", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-yjrJh5oGX7mMPKGd19YXyIjmEuj4G4zNC30bs7PM9Az7NQ3ndF3j6hbeRdvJTRQEhJ/FYQwW0a2moweEi2hMxQ=="],
 
     "bunup": ["bunup@0.16.17", "", { "dependencies": { "@bunup/dts": "^0.14.46", "@bunup/shared": "0.16.12", "chokidar": "^5.0.0", "coffi": "^0.1.37", "lightningcss": "^1.30.2", "picocolors": "^1.1.1", "tinyexec": "^1.0.2", "tree-kill": "^1.2.2", "zlye": "^0.4.4" }, "peerDependencies": { "typescript": "latest" }, "optionalPeers": ["typescript"], "bin": { "bunup": "dist/cli/index.js" } }, "sha512-zO4OcBVmYHnkc9knyZ0igcRugua59b9P5tRiW/yktdSxkKtSqREItJSas40+AM61JWHq2GXP7AoM7EJMndR9dw=="],
 
